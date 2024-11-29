@@ -61,8 +61,8 @@ url = "https://api.bling.com.br/Api/v3/nfe"
 headers = {
   'Content-Type': 'application/json',
   'Accept': 'application/json',
-  'Authorization': 'Bearer 287aee92d6862d2e8f2f595a290f0c4a74a1791a',
-  'Cookie': 'PHPSESSID=sinqitfelqfsik62bhbbngrg1o'
+  'Authorization': '',
+  'Cookie': ''
 }
 
 response = requests.request("POST", url, headers=headers, data=payload)
