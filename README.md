@@ -1,41 +1,98 @@
 # AUT-NFE
-这段代码的目的是从一个 Excel 文件中读取发票（NFe）数据，整理成特定的 JSON 格式，并通过 HTTP 请求将其发送到一个 API 接口（例如 Bling 的 API）。以下是对代码逐行分析：
 
-导入依赖库
-python
-复制代码
-import pandas as pd
-import json
-import requests
-pandas: 用于处理 Excel 文件和数据框（DataFrame）操作。
-json: 用于将 Python 字典或数据结构转换为 JSON 格式。
-requests: 用于发送 HTTP 请求。
-设置发票号码
-python
-复制代码
-发票号码="34"
-定义一个变量 发票号码，目前硬编码为 "34"，可能用于在后续的 JSON 数据中作为发票编号。
-读取 Excel 文件
-python
-复制代码
-file_path = "NFe.xlsx"
-data = pd.read_excel(file_path)
-file_path 变量指定了要读取的 Excel 文件路径。
-data = pd.read_excel(file_path) 读取该文件内容并加载到 pandas DataFrame 中。
-数据预处理
-python
-复制代码
-data = data.fillna("")  # 将空值填充为空字符串
-data['产品代码'] = data['产品代码'].astype(str).str.rstrip('.0')  # 转为字符串并移除小数点
-fillna("")：将所有空值填充为一个空字符串。
-data['产品代码'] = data['产品代码'].astype(str).str.rstrip('.0')：将 "产品代码" 列的数据转换为字符串类型，并移除尾部的 .0（这通常发生在读取 Excel 中的数字列时，避免以浮动数值形式存储的产品代码被处理为浮动型数据）。
-构建基础的 AAD JSON 对象
-python
-复制代码
-AAD = {
+# NFe JSON 生成器
+
+这个项目旨在从 Excel 文件（.xlsx 格式）中读取发票数据（NFe），并将其转换为符合 Bling API 要求的 JSON 格式。最终生成的 JSON 数据可以通过 HTTP POST 请求发送到 Bling 的 API 接口，实现电子发票的自动化处理。
+
+## 目录结构
+
+```
+NFe_JSON_Generator/
+│
+├── NFe.xlsx               # 发票数据的 Excel 文件 (示例文件)
+├── NFe_JSON_Generator.py   # Python 脚本，执行数据转换并发送请求
+├── README.md              # 项目说明文件
+└── requirements.txt       # Python 依赖包列表
+```
+
+## 依赖项
+
+这个项目需要以下 Python 库：
+
+- `pandas`：用于读取和处理 Excel 文件。
+- `requests`：用于发送 HTTP 请求。
+- `json`：用于生成 JSON 数据。
+
+在开始使用之前，请确保已经安装了这些依赖项。你可以通过以下命令安装：
+
+```bash
+pip install -r requirements.txt
+```
+
+`requirements.txt` 文件内容：
+
+```
+pandas==1.5.3
+requests==2.28.1
+```
+
+## 使用说明
+
+### 1. 配置 Excel 文件
+
+确保你的 Excel 文件（`NFe.xlsx`）具有以下列：
+
+- `产品代码`：产品的唯一标识符。
+- `产品名`：产品名称。
+- `产品单位`：产品的单位（例如，个、箱等）。
+- `数量`：产品数量。
+- `单价`：每个产品的单价。
+- `毛重`：产品的毛重（例如，千克）。
+- `净重`：产品的净重（例如，千克）。
+- `NCM号码`：商品的税务分类代码（NCM）。
+- `产品备注`：对产品的附加描述或备注。
+
+### 2. 配置脚本
+
+在 Python 脚本中，`发票号码` 和 API 请求中的一些静态数据（如日期）是硬编码的。如果你希望动态生成这些数据，可以根据需要调整脚本。
+
+```python
+发票号码 = "34"  # 发票号码，可以根据需要动态设置
+```
+
+### 3. 运行脚本
+
+运行 Python 脚本 `NFe_JSON_Generator.py`，它会读取 Excel 文件并将数据转化为 JSON 格式，最终通过 POST 请求发送到 Bling API。
+
+```bash
+python NFe_JSON_Generator.py
+```
+
+### 4. 查看响应
+
+执行脚本后，Bling API 的响应将会打印在控制台中。你可以根据响应信息检查是否成功创建了发票，或者是否有任何错误信息。
+
+## 注意事项
+
+- **API 密钥**：在请求头中，你需要使用自己的 Bearer Token 来进行认证。在代码中的 `Authorization` 字段替换为你自己的有效 token。
+  
+  ```python
+  headers = {
+      'Authorization': 'Bearer YOUR_API_TOKEN',
+  }
+  ```
+
+- **Excel 文件格式**：确保 Excel 文件中列的名称与代码中使用的字段一致，否则代码无法正确解析数据。
+
+## 示例 JSON 结构
+
+当脚本成功运行时，生成的 JSON 数据大致如下：
+
+```json
+{
     "tipo": 1,
-    "numero": "34",  # 示例数字，可根据需要动态变化
-    "dataOperacao": "2023-01-12 09:52:12",  # 示例日期，可动态生成
+    "numero": "34",
+    "dataOperacao": "2023-01-12 09:52:12",
     "contato": {
         "nome": "Contato do Bling",
         "tipoPessoa": "J",
@@ -43,64 +100,48 @@ AAD = {
         "ie": "7364873393",
         "contribuinte": 1
     },
-    "seguro": 0,  # 保险费
-    "despesas": 0,  # 其他费用
-    "desconto": 0,  # 折扣
+    "seguro": 0,
+    "despesas": 0,
+    "desconto": 0,
     "observacoes": "",
-    "itens": []  # 商品数据列表
+    "itens": [
+        {
+            "codigo": "001",
+            "descricao": "Produto A",
+            "unidade": "un",
+            "quantidade": 10,
+            "valor": 50.0,
+            "tipo": "P",
+            "pesoBruto": 2.5,
+            "pesoLiquido": 2.0,
+            "classificacaoFiscal": "12345678",
+            "origem": 1,
+            "informacoesAdicionais": "Produto de exemplo"
+        },
+        {
+            "codigo": "002",
+            "descricao": "Produto B",
+            "unidade": "un",
+            "quantidade": 5,
+            "valor": 100.0,
+            "tipo": "P",
+            "pesoBruto": 3.0,
+            "pesoLiquido": 2.8,
+            "classificacaoFiscal": "87654321",
+            "origem": 1,
+            "informacoesAdicionais": "Outro produto de exemplo"
+        }
+    ]
 }
-创建了一个基础的 JSON 对象 AAD，包含了固定的字段，如发票类型、号码、操作日期以及发票联系人的信息（例如 nome，tipoPessoa 等）。
-itens 是一个空列表，后续将会动态地添加商品数据。
-逐行处理 Excel 数据并添加商品项到 itens 列表
-python
-复制代码
-for _, row in data.iterrows():
-    item = {
-        "codigo": row['产品代码'],
-        "descricao": row['产品名'],
-        "unidade": row['产品单位'],
-        "quantidade": row['数量'],
-        "valor": row['单价'],
-        "tipo": "P",  # P为产品 S为服务
-        "pesoBruto": row['毛重'],
-        "pesoLiquido": row['净重'],
-        "classificacaoFiscal": row['NCM号码'],
-        "origem": 1,
-        "informacoesAdicionais": row['产品备注']
-    }
-    AAD["itens"].append(item)
-使用 iterrows() 方法逐行遍历 DataFrame 中的数据。
-对于每一行数据，创建一个商品条目的字典 item，并填充来自 Excel 文件的数据字段：
-codigo: 产品代码
-descricao: 产品名称
-unidade: 产品单位
-quantidade: 产品数量
-valor: 单价
-pesoBruto: 毛重
-pesoLiquido: 净重
-classificacaoFiscal: NCM 编码（商品税务分类）
-informacoesAdicionais: 产品备注
-将构建的 item 字典添加到 AAD["itens"] 列表中。
-转换为 JSON 格式并发送请求
-python
-复制代码
-payload = json.dumps(AAD, indent=4, ensure_ascii=False)
+```
 
-url = "https://api.bling.com.br/Api/v3/nfe"
-headers = {
-  'Content-Type': 'application/json',
-  'Accept': 'application/json',
-  'Authorization': 'Bearer 287aee92d6862d2e8f2f595a290f0c4a74a1791a',
-  'Cookie': 'PHPSESSID=sinqitfelqfsik62bhbbngrg1o'
-}
+## 许可协议
 
-response = requests.request("POST", url, headers=headers, data=payload)
+此项目使用 [MIT 许可证](LICENSE) 开源。
 
-print(response.text)
-json.dumps(AAD, indent=4, ensure_ascii=False)：将 AAD 字典转换为格式化的 JSON 字符串。indent=4 表示缩进为 4 个空格，ensure_ascii=False 允许非 ASCII 字符（例如中文）正确输出。
-url：指定 Bling API 的 URL，目标是 /Api/v3/nfe。
-headers：定义了请求头，指定内容类型为 JSON，接受 JSON 响应，同时通过 Authorization 头部提供了 Bearer Token 认证（需要替换为有效的 token）和 PHP 会话 ID。
-使用 requests.request 发送一个 POST 请求，将构建好的 JSON 数据作为请求体 data 发送到 Bling API。
-最后打印 API 响应的文本内容 response.text。
-总结：
-此代码的功能是从一个 Excel 文件中读取发票相关数据，格式化后生成符合 Bling API 要求的 JSON 格式，然后通过 HTTP POST 请求将其发送到指定的 URL。AAD 是生成的 JSON 数据结构，包含发票基本信息和商品列表。在处理过程中，代码还进行了数据预处理（如填充空值和格式化产品代码），并为每个商品构建了详细的 JSON 字段。
+## 联系方式
+
+如果你在使用过程中遇到问题，或者有任何疑问，请通过以下方式联系：
+
+- 邮箱：[youremail@example.com](mailto:youremail@example.com)
+- GitHub Issues：直接在 [GitHub 仓库 Issues](https://github.com/yourusername/NFe_JSON_Generator/issues) 中提交问题。
