@@ -138,10 +138,3 @@ python NFe_JSON_Generator.py
 ## 许可协议
 
 此项目使用 [MIT 许可证](LICENSE) 开源。
-
-## 联系方式
-
-如果你在使用过程中遇到问题，或者有任何疑问，请通过以下方式联系：
-
-- 邮箱：[youremail@example.com](mailto:youremail@example.com)
-- GitHub Issues：直接在 [GitHub 仓库 Issues](https://github.com/yourusername/NFe_JSON_Generator/issues) 中提交问题。
