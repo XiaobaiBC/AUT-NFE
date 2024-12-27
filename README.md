@@ -101,21 +101,3 @@
 ### `generate_calculations(self, target_number: float)`
 生成一系列计算式，使结果尽量接近目标数字。
 
-## 贡献
-
-欢迎贡献代码和改进！如果有任何问题或建议，请提交 [Issue](https://github.com/yourusername/SmartCalculator/issues) 或直接提交 Pull Request。
-
-## License
-
-MIT License
-```
-
-### 说明
-
-1. **环境要求**：要求使用 Python 3.x 并安装 `numpy` 库。
-2. **使用方法**：包括如何安装和运行程序的步骤，以及如何输入目标数字并查看输出结果。
-3. **代码结构**：简要描述了程序的主要类和方法。
-4. **贡献**：鼓励用户贡献代码，提出问题或改进。
-5. **License**：MIT 许可协议（可以根据实际需要调整）。
-
-您可以根据需要调整或补充 `README.md` 中的信息，尤其是代码的 GitHub 地址等。
