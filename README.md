@@ -1,6 +1,3 @@
-下面是根据您提供的程序生成的 `README.md` 文件：
-
-```markdown
 # SmartCalculator - 智能计算器
 
 `SmartCalculator` 是一个基于机器学习思想的计算器，它通过生成一系列乘法计算式来逼近目标数字。程序通过动态调整乘数的选择权重，优化计算过程，从而使得最终的计算结果尽量接近目标。
@@ -46,7 +43,6 @@
    ```bash
    git clone https://github.com/yourusername/SmartCalculator.git
    cd SmartCalculator
-   ```
 
 2. 安装依赖项：
 
