@@ -41,7 +41,7 @@
 1. 克隆代码到本地：
 
    ```bash
-   git clone https://github.com/yourusername/SmartCalculator.git
+   git clone https://github.com/XiaobaiBC/SmartCalculator.git
    cd SmartCalculator
 
 2. 安装依赖项：
